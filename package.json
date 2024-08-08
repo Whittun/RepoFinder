@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "prepare": "husky"
   },
-  "list-staged": {
+  "lint-staged": {
     "*.{ts, tsx}": [
       "eslint"
     ]
