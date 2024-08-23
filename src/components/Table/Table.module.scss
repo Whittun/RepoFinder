@@ -1,0 +1,13 @@
+@import "../../assets/styles/variables.scss";
+
+.table {
+  margin-top: 24px;
+}
+
+.row {
+  cursor: pointer;
+
+  &:hover {
+    background-color: $table-row-hover;
+  }
+}

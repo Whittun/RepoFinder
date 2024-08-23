@@ -1,0 +1,65 @@
+@import "../../assets/styles/variables.scss";
+
+.detail {
+  display: flex;
+  width: 30%;
+  padding: 24px;
+  padding-right: 32px;
+
+  background-color: $aside-background;
+}
+
+.content-wrapper {
+  width: 100%;
+}
+
+.welcome {
+  margin: auto;
+}
+
+.chip {
+  color: $light-text-color;
+
+  background-color: $chip-background;
+
+  &--alt {
+    height: 24px;
+  }
+}
+
+.repo-name {
+  margin-bottom: 16px;
+}
+
+.main-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.list-item {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.star-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.star {
+  path {
+    fill: $star-color;
+  }
+}
+
+.description {
+  margin-top: 24px;
+}

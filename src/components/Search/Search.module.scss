@@ -1,0 +1,44 @@
+@import "../../assets/styles/variables.scss";
+
+.header {
+  padding: 20px 32px;
+
+  background-color: $header-background;
+  box-shadow: none;
+}
+
+.search-wrapper {
+  max-width: 912px;
+  flex-grow: 1;
+
+  background-color: $search-background;
+  border-radius: 4px;
+}
+
+.search-inner {
+  height: 100%;
+
+  fieldset {
+    border: none;
+  }
+}
+
+.search-input {
+  padding: 9px 16px;
+
+  color: $placeholder-color;
+  font-weight: 500;
+
+  &::placeholder {
+    color: $placeholder-color;
+    font-weight: 500;
+
+    opacity: 1;
+  }
+}
+
+.search-button {
+  min-width: 105px;
+
+  background-color: $search-button-color;
+}

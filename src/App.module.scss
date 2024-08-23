@@ -1,0 +1,17 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.welcome {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 81px);
+}
+
+.content-wrapper {
+  display: flex;
+  flex-grow: 1;
+}
