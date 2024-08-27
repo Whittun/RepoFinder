@@ -5,7 +5,7 @@ import styles from "./DetailInfo.module.scss";
 import { RepositoryData } from "../Search/Search";
 
 interface DetailInfoProps {
-  selectedRepository: RepositoryData;
+  selectedRepository: RepositoryData | null;
 }
 
 export const DetailInfo: React.FC<DetailInfoProps> = ({

@@ -39,19 +39,21 @@ interface SearchComponentProps {
   searchValue: string;
   setSearchValue: React.Dispatch<React.SetStateAction<string>>;
   setGithubData: React.Dispatch<React.SetStateAction<RepositoryData[] | null>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const SearchComponent: React.FC<SearchComponentProps> = ({
   searchValue,
   setSearchValue,
   setGithubData,
+  setIsLoading,
 }) => {
   const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
   const query = `query {
-    search(query: "${searchValue}", type: REPOSITORY, first: 10) {
+    search(query: "${searchValue}", type: REPOSITORY, first: 50) {
       edges {
         node {
           ... on Repository {
@@ -77,6 +79,8 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
   }`;
 
   const getGithubData = async () => {
+    setIsLoading(true);
+    console.log(query);
     const response = await fetch("https://api.github.com/graphql", {
       method: "POST",
       headers: {
@@ -88,7 +92,6 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
 
     const data = await response.json();
     console.log(data);
-
     const formattedData = data.data.search.edges.map(({ node }: Edge) => {
       const {
         name,
@@ -120,6 +123,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
     const githubData = await getGithubData();
 
     setGithubData(githubData);
+    setIsLoading(false);
   };
 
   return (

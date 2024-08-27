@@ -14,6 +14,7 @@ interface MainContentProps {
 export const MainContent: React.FC<MainContentProps> = ({
   githubData,
   setSelectedRepository,
+  isLoading,
 }) => {
   return (
     <Box component="main" className={styles.main}>
@@ -22,6 +23,7 @@ export const MainContent: React.FC<MainContentProps> = ({
           Результаты поиска
         </Typography>
         <TableComponent
+          isLoading={isLoading}
           setSelectedRepository={setSelectedRepository}
           tableData={githubData}
         />

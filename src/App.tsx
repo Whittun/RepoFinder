@@ -5,7 +5,7 @@ import { useState } from "react";
 import { DetailInfo } from "./components/DetailInfo/DetailInfo";
 import { Box, Typography } from "@mui/material";
 
-import style from "./App.module.scss";
+import styles from "./App.module.scss";
 
 interface LanguageNode {
   node: {
@@ -110,28 +110,48 @@ export const App = () => {
   const [githubData, setGithubData] = useState<RepositoryData[] | null>(null);
   const [selectedRepository, setSelectedRepository] =
     useState<RepositoryData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <GlobalCssPriority>
-      <Box className={style.app}>
+      <Box className={styles.app}>
         <SearchComponent
+          setIsLoading={setIsLoading}
           searchValue={searchValue}
           setSearchValue={setSearchValue}
           setGithubData={setGithubData}
         />
         {githubData ? (
-          <Box className={style["content-wrapper"]}>
+          <Box className={styles["content-wrapper"]}>
             <MainContent
               setSelectedRepository={setSelectedRepository}
               githubData={githubData}
+              isLoading={isLoading}
             />
             <DetailInfo selectedRepository={selectedRepository} />
           </Box>
         ) : (
           <Box>
-            <Typography className={style.welcome} component="h1" variant="h3">
-              Добро пожаловать
-            </Typography>
+            {isLoading ? (
+              <Typography
+                className={styles.welcome}
+                component="h1"
+                variant="h3"
+              >
+                Ищем репозитории
+                <span className={styles.dot}>.</span>
+                <span className={styles.dot}>.</span>
+                <span className={styles.dot}>.</span>
+              </Typography>
+            ) : (
+              <Typography
+                className={styles.welcome}
+                component="h1"
+                variant="h3"
+              >
+                Добро пожаловать
+              </Typography>
+            )}
           </Box>
         )}
       </Box>
