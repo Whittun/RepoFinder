@@ -11,7 +11,6 @@ interface DetailInfoProps {
 export const DetailInfo: React.FC<DetailInfoProps> = ({
   selectedRepository,
 }) => {
-  console.log(selectedRepository);
   return (
     <Box className={styles.detail} component="aside">
       {!selectedRepository ? (

@@ -105,8 +105,6 @@ interface RepositoryData {
 // };
 
 export const App = () => {
-  const [searchValue, setSearchValue] = useState("");
-
   const [githubData, setGithubData] = useState<RepositoryData[] | null>(null);
   const [selectedRepository, setSelectedRepository] =
     useState<RepositoryData | null>(null);
@@ -114,11 +112,10 @@ export const App = () => {
 
   return (
     <GlobalCssPriority>
+      <Box></Box>
       <Box className={styles.app}>
         <SearchComponent
           setIsLoading={setIsLoading}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
           setGithubData={setGithubData}
         />
         {githubData ? (

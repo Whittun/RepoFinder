@@ -1,5 +1,9 @@
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./Search.module.scss";
 import { AppBar, Button, Stack, TextField } from "@mui/material";
+import { searchInputHandler } from "../../store/searchSlice";
+import { useLazyGetRepositoriesQuery } from "../../api/apiSlice";
+import { useEffect } from "react";
 
 interface LanguageNode {
   node: {
@@ -36,51 +40,36 @@ export interface RepositoryData {
 }
 
 interface SearchComponentProps {
-  searchValue: string;
-  setSearchValue: React.Dispatch<React.SetStateAction<string>>;
   setGithubData: React.Dispatch<React.SetStateAction<RepositoryData[] | null>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const SearchComponent: React.FC<SearchComponentProps> = ({
-  searchValue,
-  setSearchValue,
   setGithubData,
-  setIsLoading,
 }) => {
-  const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
+  const dispatch = useDispatch();
+
+  const { searchValue } = useSelector((state) => state.search);
+
+  const [triggerSearch, { data, isLoading }] = useLazyGetRepositoriesQuery();
+
+  const handleSearch = async () => {
+    await triggerSearch(searchValue);
   };
 
-  const query = `query {
-    search(query: "${searchValue}", type: REPOSITORY, first: 50) {
-      edges {
-        node {
-          ... on Repository {
-            name
-            description
-            primaryLanguage {
-              name
-            }
-            languages(first:10) {
-              edges {
-                node {
-                  name
-                }
-              }
-            }
-            forkCount
-            stargazerCount
-            updatedAt
-          }
-        }
-      }
+  const setFetchData = async () => {
+    const githubData = await getGithubData();
+
+    setGithubData(githubData);
+  };
+
+  useEffect(() => {
+    if (data) {
+      setFetchData();
     }
-  }`;
+  }, [data]);
 
   const getGithubData = async () => {
-    setIsLoading(true);
-    console.log(query);
     const response = await fetch("https://api.github.com/graphql", {
       method: "POST",
       headers: {
@@ -92,6 +81,7 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
 
     const data = await response.json();
     console.log(data);
+
     const formattedData = data.data.search.edges.map(({ node }: Edge) => {
       const {
         name,
@@ -119,30 +109,24 @@ export const SearchComponent: React.FC<SearchComponentProps> = ({
     return formattedData;
   };
 
-  const setFetchData = async () => {
-    const githubData = await getGithubData();
-
-    setGithubData(githubData);
-    setIsLoading(false);
-  };
-
   return (
     <AppBar position="static" className={styles.header}>
       <Stack direction="row" spacing={1}>
+        {isLoading && "Загрузка..."}
         <TextField
           className={styles["search-wrapper"]}
           InputProps={{
             className: styles["search-inner"],
           }}
           inputProps={{
-            onChange: inputHandler,
+            onChange: (e) => dispatch(searchInputHandler(e.target.value)),
             value: searchValue,
             className: styles["search-input"],
           }}
           placeholder="Поисковый запрос"
         ></TextField>
         <Button
-          onClick={setFetchData}
+          onClick={handleSearch}
           className={styles[`search-button`]}
           variant="contained"
         >

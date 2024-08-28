@@ -12,7 +12,12 @@ import {
 
 import styles from "./Table.module.scss";
 import { RepositoryData } from "../Search/Search";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  handleRowOrder,
+  changePageHandler,
+  changeRowsPerPageHandler,
+} from "../../store/tableSlice";
 
 interface TableComponentProps {
   tableData: RepositoryData[];
@@ -26,35 +31,14 @@ export const TableComponent: React.FC<TableComponentProps> = ({
   setSelectedRepository,
   isLoading,
 }) => {
+  const { page, rowsPerPage, order, orderBy } = useSelector(
+    (state) => state.table,
+  );
+
+  const dispatch = useDispatch();
+
   const rowHandler = (tableData: RepositoryData) => {
     setSelectedRepository(tableData);
-  };
-
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<keyof RepositoryData>("forkCount");
-
-  const changePageHandler = (
-    _: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
-    newPage: number,
-  ) => {
-    setPage(newPage);
-  };
-
-  const changeRowsPerPageHandler = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const rowsPerPage = Number(event.target.value);
-    setRowsPerPage(rowsPerPage);
-    setPage(0);
-  };
-
-  const handleRowOrder = (property: keyof RepositoryData) => {
-    const isAsc = property === orderBy && order === "asc";
-
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
   };
 
   const sortedRows = tableData.sort((a, b) => {
@@ -83,7 +67,7 @@ export const TableComponent: React.FC<TableComponentProps> = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === "forkCount"}
-                  onClick={() => handleRowOrder("forkCount")}
+                  onClick={() => dispatch(handleRowOrder("forkCount"))}
                   className={styles.sort}
                   direction={orderBy === "forkCount" ? order : "asc"}
                 >
@@ -93,7 +77,7 @@ export const TableComponent: React.FC<TableComponentProps> = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === "stargazerCount"}
-                  onClick={() => handleRowOrder("stargazerCount")}
+                  onClick={() => dispatch(handleRowOrder("stargazerCount"))}
                   className={styles.sort}
                   direction={orderBy === "stargazerCount" ? order : "asc"}
                 >
@@ -103,7 +87,7 @@ export const TableComponent: React.FC<TableComponentProps> = ({
               <TableCell>
                 <TableSortLabel
                   active={orderBy === "updatedAt"}
-                  onClick={() => handleRowOrder("updatedAt")}
+                  onClick={() => dispatch(handleRowOrder("updatedAt"))}
                   className={styles.sort}
                   direction={orderBy === "updatedAt" ? order : "asc"}
                 >
@@ -167,8 +151,10 @@ export const TableComponent: React.FC<TableComponentProps> = ({
           component={"div"}
           page={page}
           rowsPerPage={rowsPerPage}
-          onPageChange={changePageHandler}
-          onRowsPerPageChange={changeRowsPerPageHandler}
+          onPageChange={(_, newPage) => dispatch(changePageHandler(newPage))}
+          onRowsPerPageChange={(e) =>
+            dispatch(changeRowsPerPageHandler(e.target.value))
+          }
           count={tableData.length}
         />
       )}
