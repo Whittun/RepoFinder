@@ -5,56 +5,36 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
-  TableSortLabel,
 } from "@mui/material";
 
 import styles from "./Table.module.scss";
-import { RepositoryData } from "../Search/Search";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  handleRowOrder,
-  changePageHandler,
-  changeRowsPerPageHandler,
-} from "../../store/tableSlice";
 
-interface TableComponentProps {
-  tableData: RepositoryData[];
-  setSelectedRepository: React.Dispatch<
-    React.SetStateAction<RepositoryData | null>
-  >;
-}
+export const TableComponent = () => {
+  // const { page, rowsPerPage, order, orderBy } = useSelector(
+  //   (state) => state.table,
+  // );
 
-export const TableComponent: React.FC<TableComponentProps> = ({
-  tableData,
-  setSelectedRepository,
-  isLoading,
-}) => {
-  const { page, rowsPerPage, order, orderBy } = useSelector(
-    (state) => state.table,
-  );
+  // const dispatch = useDispatch();
 
-  const dispatch = useDispatch();
+  // const rowHandler = (tableData: RepositoryData) => {
+  //   setSelectedRepository(tableData);
+  // };
 
-  const rowHandler = (tableData: RepositoryData) => {
-    setSelectedRepository(tableData);
-  };
+  // const sortedRows = tableData.sort((a, b) => {
+  //   const aValue = a[orderBy];
+  //   const bValue = b[orderBy];
 
-  const sortedRows = tableData.sort((a, b) => {
-    const aValue = a[orderBy];
-    const bValue = b[orderBy];
+  //   if (aValue < bValue) {
+  //     return order === "asc" ? -1 : 1;
+  //   }
 
-    if (aValue < bValue) {
-      return order === "asc" ? -1 : 1;
-    }
+  //   if (aValue > bValue) {
+  //     return order === "asc" ? 1 : -1;
+  //   }
 
-    if (aValue > bValue) {
-      return order === "asc" ? 1 : -1;
-    }
-
-    return 0;
-  });
+  //   return 0;
+  // });
 
   return (
     <Box className={styles["table-wrapper"]}>
@@ -65,7 +45,7 @@ export const TableComponent: React.FC<TableComponentProps> = ({
               <TableCell>Название</TableCell>
               <TableCell>Язык</TableCell>
               <TableCell>
-                <TableSortLabel
+                {/* <TableSortLabel
                   active={orderBy === "forkCount"}
                   onClick={() => dispatch(handleRowOrder("forkCount"))}
                   className={styles.sort}
@@ -92,72 +72,67 @@ export const TableComponent: React.FC<TableComponentProps> = ({
                   direction={orderBy === "updatedAt" ? order : "asc"}
                 >
                   Дата обновления
-                </TableSortLabel>
+                </TableSortLabel> */}
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {!isLoading ? (
-              sortedRows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  const date = new Date(row.updatedAt);
+            {/* {sortedRows
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
+                const date = new Date(row.updatedAt);
 
-                  const year = date.getUTCFullYear();
-                  const month = date.getUTCMonth() + 1;
-                  const day = date.getUTCDate();
+                const year = date.getUTCFullYear();
+                const month = date.getUTCMonth() + 1;
+                const day = date.getUTCDate();
 
-                  const formattedDate = `${day.toString().padStart(2, "0")}.${month.toString().padStart(2, "0")}.${year}`;
+                const formattedDate = `${day.toString().padStart(2, "0")}.${month.toString().padStart(2, "0")}.${year}`;
 
-                  return (
-                    <TableRow
-                      onClick={() => rowHandler(row)}
-                      className={styles.row}
-                      key={index}
-                    >
-                      <TableCell>{row.name}</TableCell>
-                      <TableCell>{row.primaryLanguageName}</TableCell>
-                      <TableCell>{row.forkCount}</TableCell>
-                      <TableCell>{row.stargazerCount}</TableCell>
-                      <TableCell>{formattedDate}</TableCell>
-                    </TableRow>
-                  );
-                })
-            ) : (
-              <TableRow>
-                <TableCell>
-                  <Box className={styles["load-cell"]}></Box>
-                </TableCell>
-                <TableCell>
-                  <Box className={styles["load-cell"]}></Box>
-                </TableCell>
-                <TableCell>
-                  <Box className={styles["load-cell"]}></Box>
-                </TableCell>
-                <TableCell>
-                  <Box className={styles["load-cell"]}></Box>
-                </TableCell>
-                <TableCell>
-                  <Box className={styles["load-cell"]}></Box>
-                </TableCell>
-              </TableRow>
-            )}
+                return (
+                  <TableRow className={styles.row} key={index}>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.primaryLanguageName}</TableCell>
+                    <TableCell>{row.forkCount}</TableCell>
+                    <TableCell>{row.stargazerCount}</TableCell>
+                    <TableCell>{formattedDate}</TableCell>
+                  </TableRow>
+                );
+              })} */}
           </TableBody>
         </Table>
       </TableContainer>
-      {!isLoading && (
-        <TablePagination
-          className={styles.pagination}
-          component={"div"}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={(_, newPage) => dispatch(changePageHandler(newPage))}
-          onRowsPerPageChange={(e) =>
-            dispatch(changeRowsPerPageHandler(e.target.value))
-          }
-          count={tableData.length}
-        />
-      )}
+
+      {/* <TablePagination
+        className={styles.pagination}
+        component={"div"}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(_, newPage) => dispatch(changePageHandler(newPage))}
+        onRowsPerPageChange={(e) =>
+          dispatch(changeRowsPerPageHandler(e.target.value))
+        }
+        count={tableData.length}
+      /> */}
     </Box>
   );
 };
+
+{
+  /* <TableRow>
+                <TableCell>
+                  <Box className={styles["load-cell"]}></Box>
+                </TableCell>
+                <TableCell>
+                  <Box className={styles["load-cell"]}></Box>
+                </TableCell>
+                <TableCell>
+                  <Box className={styles["load-cell"]}></Box>
+                </TableCell>
+                <TableCell>
+                  <Box className={styles["load-cell"]}></Box>
+                </TableCell>
+                <TableCell>
+                  <Box className={styles["load-cell"]}></Box>
+                </TableCell>
+              </TableRow> */
+}

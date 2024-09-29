@@ -11,15 +11,15 @@ export const githubGraphQLApi = createApi({
       return headers;
     },
   }),
-  endpoints: (build) => ({
-    getRepositories: build.query({
-      query: (queryString) => ({
+  endpoints: (builder) => ({
+    getRepositories: builder.query({
+      query: (query: string) => ({
         url: "",
         method: "POST",
         body: {
           query: `
-            query($queryString: String!) {
-              search(query: $queryString, type: REPOSITORY, first: 50) {
+            query() {
+              search(query: "${query}", type: REPOSITORY, first: 50) {
                 edges {
                   node {
                     ... on Repository {
@@ -43,13 +43,8 @@ export const githubGraphQLApi = createApi({
                 }
               }
             }`,
-          variables: {
-            queryString,
-          },
         },
       }),
     }),
   }),
 });
-
-export const { useLazyGetRepositoriesQuery } = githubGraphQLApi;
