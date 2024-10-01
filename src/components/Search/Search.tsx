@@ -1,69 +1,15 @@
+import { useSearchParams } from "react-router-dom";
 import styles from "./Search.module.scss";
 import { AppBar, Button, Stack, TextField } from "@mui/material";
-
-// interface LanguageNode {
-//   node: {
-//     name: string;
-//   };
-// }
-
-// interface NodeData {
-//   name: string;
-//   description: string;
-//   primaryLanguage: {
-//     name: string;
-//   } | null;
-//   languages: {
-//     edges: LanguageNode[];
-//   };
-//   forkCount: number;
-//   stargazerCount: number;
-//   updatedAt: string;
-// }
-
-// interface Edge {
-//   node: NodeData;
-// }
-
-// export interface RepositoryData {
-//   name: string;
-//   description: string;
-//   primaryLanguageName: string;
-//   languages: { edges: LanguageNode[] };
-//   forkCount: number;
-//   stargazerCount: number;
-//   updatedAt: string;
-// }
+import React, { useState } from "react";
 
 export const SearchComponent = () => {
-  // const [searchParams, setSearchParams] = useSearchParams();
+  const [inputValue, setInputValue] = useState<string>("");
+  const [, setSearchParams] = useSearchParams();
 
-  //   const formattedData = data.data.search.edges.map(({ node }: Edge) => {
-  //     const {
-  //       name,
-  //       description,
-  //       primaryLanguage,
-  //       languages,
-  //       forkCount,
-  //       stargazerCount,
-  //       updatedAt,
-  //     } = node;
-
-  //     const primaryLanguageName = primaryLanguage?.name ?? "Unknown";
-
-  //     return {
-  //       name,
-  //       description,
-  //       primaryLanguageName,
-  //       languages,
-  //       forkCount,
-  //       stargazerCount,
-  //       updatedAt,
-  //     };
-  //   });
-
-  //   return formattedData;
-  // };
+  const updateQuery = () => {
+    setSearchParams({ query: inputValue, page: "1" });
+  };
 
   return (
     <AppBar position="static" className={styles.header}>
@@ -74,11 +20,18 @@ export const SearchComponent = () => {
             className: styles["search-inner"],
           }}
           inputProps={{
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+              setInputValue(e.target.value),
+            value: inputValue,
             className: styles["search-input"],
           }}
           placeholder="Поисковый запрос"
         ></TextField>
-        <Button className={styles[`search-button`]} variant="contained">
+        <Button
+          onClick={updateQuery}
+          className={styles[`search-button`]}
+          variant="contained"
+        >
           Искать
         </Button>
       </Stack>

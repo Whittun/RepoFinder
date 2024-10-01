@@ -1,13 +1,13 @@
-import { Box, Chip, List, Typography } from "@mui/material";
+import { Box, Chip, List, ListItem, Typography } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 
 import styles from "./DetailInfo.module.scss";
+import { useSelector } from "react-redux";
+import { selectSetRepository } from "../Table/tableSlice";
 
-// interface DetailInfoProps {
-//   selectedRepository: RepositoryData | null;
-// }
-
-export const DetailInfo = ({ selectedRepository }) => {
+export const DetailInfo = () => {
+  const selectedRepository = useSelector(selectSetRepository);
+  console.log(selectedRepository);
   return (
     <Box className={styles.detail} component="aside">
       {!selectedRepository ? (
@@ -34,14 +34,14 @@ export const DetailInfo = ({ selectedRepository }) => {
 
           {selectedRepository.languages && (
             <List className={styles["list"]}>
-              {/* {selectedRepository.languages.edges.map((language, index) => (
+              {selectedRepository.languages.edges.map((language, index) => (
                 <ListItem className={styles["list-item"]} key={index}>
                   <Chip
                     className={(styles.chip, styles["chip--alt"])}
                     label={language.node.name}
                   ></Chip>
                 </ListItem>
-              ))} */}
+              ))}
             </List>
           )}
 

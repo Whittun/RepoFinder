@@ -5,7 +5,7 @@ export const githubGraphQLApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "https://api.github.com/graphql",
     prepareHeaders: (headers) => {
-      headers.set("Authorization", `bearer ${process.env.REACT_APP_API_KEY}`);
+      headers.set("Authorization", `bearer ${import.meta.env.VITE_API_KEY}`);
       headers.set("Content-Type", "application/json");
 
       return headers;
@@ -48,3 +48,5 @@ export const githubGraphQLApi = createApi({
     }),
   }),
 });
+
+export const { useLazyGetRepositoriesQuery } = githubGraphQLApi;
