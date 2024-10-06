@@ -6,6 +6,10 @@
   justify-content: center;
   align-items: center;
   flex-grow: 1;
+
+  &--not-empty {
+    justify-content: start;
+  }
 }
 
 .table {

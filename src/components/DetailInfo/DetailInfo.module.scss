@@ -1,7 +1,6 @@
 @import "../../assets/styles/variables.scss";
 
 .detail {
-  display: flex;
   width: 30%;
   padding: 24px;
   padding-right: 32px;
@@ -14,7 +13,12 @@
 }
 
 .welcome {
-  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 130px);
+
+  text-align: center;
 }
 
 .chip {

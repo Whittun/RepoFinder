@@ -70,14 +70,20 @@ export const TableComponent = () => {
     useLazyGetRepositoriesQuery();
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || isFetching) {
+      console.log("Загрузка...");
       setMessage("Загрузка...");
     }
 
-    if (isSuccess && data) {
+    if (isSuccess && data.data.search.edges.length && !isFetching) {
+      console.log("Результаты поиска");
       setMessage("Результаты поиска");
     }
-  }, [isLoading, isSuccess, data]);
+
+    if (isSuccess && data.data.search.edges.length === 0 && !isFetching) {
+      setMessage("Ничего не найдено");
+    }
+  }, [isLoading, isSuccess, isFetching, data]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -167,7 +173,9 @@ export const TableComponent = () => {
   };
 
   return (
-    <Box className={styles["table-wrapper"]}>
+    <Box
+      className={`${styles["table-wrapper"]} ${isSuccess ? styles["table-wrapper--not-empty"] : ""}`}
+    >
       {message && (
         <Box
           className={styles[`welcome-wrapper${isSuccess ? "--loaded" : ""}`]}
@@ -177,7 +185,7 @@ export const TableComponent = () => {
           </Typography>
         </Box>
       )}
-      {isSuccess && (
+      {isSuccess && !!sortedRows.length && (
         <Box className={styles["table-inner"]}>
           <TableContainer className={styles.table}>
             <Table aria-label="таблица с результатами">

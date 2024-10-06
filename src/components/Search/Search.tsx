@@ -31,6 +31,7 @@ export const SearchComponent = () => {
           onClick={updateQuery}
           className={styles[`search-button`]}
           variant="contained"
+          disabled={!inputValue.trim().length}
         >
           Искать
         </Button>
