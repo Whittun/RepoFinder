@@ -1,19 +1,44 @@
-import { Box, Chip, List, ListItem, Typography } from "@mui/material";
+import {
+  Box,
+  Chip,
+  IconButton,
+  List,
+  ListItem,
+  Typography,
+} from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
+import CloseIcon from "@mui/icons-material/Close";
 
 import styles from "./DetailInfo.module.scss";
 import { useSelector } from "react-redux";
 import { selectSetRepository } from "../Table/tableSlice";
+import { useEffect, useState } from "react";
 
 export const DetailInfo = () => {
   const selectedRepository = useSelector(selectSetRepository);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (selectedRepository) {
+      setIsOpen(true);
+    }
+  }, [selectedRepository]);
 
   return (
-    <Box className={styles.detail} component="aside">
+    <Box
+      className={`${styles.detail} ${!isOpen ? styles["detail--close"] : ""}`}
+      component="aside"
+    >
       {!selectedRepository ? (
         <Typography className={styles.welcome}>Выберите репозиторий</Typography>
       ) : (
         <Box className={styles["content-wrapper"]}>
+          <IconButton
+            onClick={() => setIsOpen(!isOpen)}
+            className={styles["close-button"]}
+          >
+            <CloseIcon />
+          </IconButton>
           <Typography
             className={styles["repo-name"]}
             component="h2"

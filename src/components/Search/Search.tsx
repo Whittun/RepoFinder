@@ -8,7 +8,7 @@ export const SearchComponent = () => {
   const [, setSearchParams] = useSearchParams();
 
   const updateQuery = () => {
-    setSearchParams({ query: inputValue });
+    setSearchParams({ query: inputValue.replace(/[^\w\sА-Яа-яЁё]/gi, "") });
   };
 
   return (

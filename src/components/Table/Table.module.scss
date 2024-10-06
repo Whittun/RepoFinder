@@ -22,6 +22,10 @@
 
 .welcome {
   align-self: start;
+
+  @media (max-width: 1050px) {
+    font-size: 30px;
+  }
 }
 
 .welcome-wrapper--loaded {
