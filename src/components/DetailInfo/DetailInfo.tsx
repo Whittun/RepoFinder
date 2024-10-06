@@ -7,7 +7,7 @@ import { selectSetRepository } from "../Table/tableSlice";
 
 export const DetailInfo = () => {
   const selectedRepository = useSelector(selectSetRepository);
-  console.log(selectedRepository);
+
   return (
     <Box className={styles.detail} component="aside">
       {!selectedRepository ? (

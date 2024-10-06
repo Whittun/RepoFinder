@@ -3,11 +3,25 @@
 .table-wrapper {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   flex-grow: 1;
 }
 
 .table {
   margin-top: 24px;
+}
+
+.table-inner {
+  width: 100%;
+}
+
+.welcome {
+  align-self: start;
+}
+
+.welcome-wrapper--loaded {
+  align-self: start;
 }
 
 .row {
@@ -24,7 +38,7 @@
 
 .load-cell {
   width: 70px;
-  height: 25px;
+  height: 20px;
 
   background: linear-gradient(
     110deg,

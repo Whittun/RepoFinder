@@ -58,6 +58,8 @@ export const TableComponent = () => {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = useState<keyof RepositoryData>("forkCount");
   const [message, setMessage] = useState("Добро пожаловать");
+  const [beforeCursor, setBeforeCursor] = useState(null);
+  const [afterCursor, setAfterCursor] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -79,11 +81,18 @@ export const TableComponent = () => {
 
   useEffect(() => {
     if (searchQuery) {
-      trigger(searchQuery);
+      console.log("before: ", beforeCursor, "after: ", afterCursor);
+      trigger({
+        query: searchQuery,
+        numberElements: rowsPerPage,
+        before: beforeCursor,
+        after: afterCursor,
+      });
     }
-  }, [trigger, searchQuery]);
+  }, [trigger, searchQuery, rowsPerPage, beforeCursor, afterCursor]);
 
   let formattedData = null;
+  console.log(data);
   if (data) {
     formattedData = data.data.search.edges.map(({ node }: Edge) => {
       const {
@@ -140,8 +149,16 @@ export const TableComponent = () => {
     setOrderBy(row);
   };
 
-  const changePageHandler = (page: number) => {
-    setPage(page);
+  const changePageHandler = (newPage: number) => {
+    if (newPage > page && data.data.search.pageInfo.hasNextPage) {
+      setAfterCursor(data.data.search.pageInfo.endCursor);
+      setBeforeCursor(null);
+    } else if (newPage < page && data.data.search.pageInfo.hasPreviousPage) {
+      setBeforeCursor(data.data.search.pageInfo.startCursor);
+      setAfterCursor(null);
+    }
+
+    setPage(newPage);
   };
 
   const changeRowsPerPageHandler = (rowsPerPage: number) => {
@@ -152,14 +169,16 @@ export const TableComponent = () => {
   return (
     <Box className={styles["table-wrapper"]}>
       {message && (
-        <Box>
+        <Box
+          className={styles[`welcome-wrapper${isSuccess ? "--loaded" : ""}`]}
+        >
           <Typography className={styles.welcome} component="h1" variant="h3">
             {message}
           </Typography>
         </Box>
       )}
       {isSuccess && (
-        <Box>
+        <Box className={styles["table-inner"]}>
           <TableContainer className={styles.table}>
             <Table aria-label="таблица с результатами">
               <TableHead>
@@ -199,29 +218,28 @@ export const TableComponent = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {isFetching ? (
-                  <TableRow>
-                    <TableCell>
-                      <Box className={styles["load-cell"]}></Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box className={styles["load-cell"]}></Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box className={styles["load-cell"]}></Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box className={styles["load-cell"]}></Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box className={styles["load-cell"]}></Box>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sortedRows &&
-                  sortedRows
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, index) => {
+                {isFetching
+                  ? sortedRows.map(() => (
+                      <TableRow>
+                        <TableCell>
+                          <Box className={styles["load-cell"]}></Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box className={styles["load-cell"]}></Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box className={styles["load-cell"]}></Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box className={styles["load-cell"]}></Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box className={styles["load-cell"]}></Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : sortedRows &&
+                    sortedRows.map((row, index) => {
                       const date = new Date(row.updatedAt);
                       const year = date.getUTCFullYear();
                       const month = date.getUTCMonth() + 1;
@@ -241,8 +259,7 @@ export const TableComponent = () => {
                           <TableCell>{formattedDate}</TableCell>
                         </TableRow>
                       );
-                    })
-                )}
+                    })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -255,7 +272,23 @@ export const TableComponent = () => {
             onRowsPerPageChange={(e) =>
               changeRowsPerPageHandler(e.target.value)
             }
-            count={formattedData.length}
+            count={-1}
+            slotProps={{
+              actions: {
+                nextButton: {
+                  disabled:
+                    !data.data.search.pageInfo.hasNextPage || isFetching,
+                },
+                previousButton: {
+                  disabled:
+                    isFetching ||
+                    !data?.data?.search?.pageInfo?.hasPreviousPage,
+                },
+              },
+            }}
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} из ${count !== -1 ? count : `больше чем ${to}`}`
+            }
           />
         </Box>
       )}

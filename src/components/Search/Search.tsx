@@ -8,7 +8,7 @@ export const SearchComponent = () => {
   const [, setSearchParams] = useSearchParams();
 
   const updateQuery = () => {
-    setSearchParams({ query: inputValue, page: "1" });
+    setSearchParams({ query: inputValue });
   };
 
   return (

@@ -13,13 +13,10 @@ export const githubGraphQLApi = createApi({
   }),
   endpoints: (builder) => ({
     getRepositories: builder.query({
-      query: (query: string) => ({
-        url: "",
-        method: "POST",
-        body: {
-          query: `
+      query: ({ query, numberElements, before, after }) => {
+        const gqlQuery = `
             query() {
-              search(query: "${query}", type: REPOSITORY, first: 50) {
+              search(query: "${query}", type: REPOSITORY, ${before ? "last:" + numberElements + ", before:" + `"${before}"` : after ? "first:" + numberElements + ", after: " + `"${after}"` : "first:" + numberElements}) {
                 edges {
                   node {
                     ... on Repository {
@@ -40,13 +37,29 @@ export const githubGraphQLApi = createApi({
                       updatedAt
                     }
                   } 
+                  cursor
+                }
+                pageInfo {
+                  startCursor
+                  endCursor
+                  hasPreviousPage
+                  hasNextPage
                 }
               }
-            }`,
-        },
-      }),
+            }`;
+        console.log(gqlQuery);
+        return {
+          url: "",
+          method: "POST",
+          body: {
+            query: gqlQuery,
+          },
+        };
+      },
     }),
   }),
 });
 
 export const { useLazyGetRepositoriesQuery } = githubGraphQLApi;
+
+// before: ${before ? `"${before}"` : "null"}, after: ${after ? `"${after}"` : "null"}
