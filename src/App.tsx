@@ -1,33 +1,18 @@
-import { SearchComponent } from "./components/Search/Search";
 import { GlobalCssPriority } from "./GlobalCssPriority";
-import { MainContent } from "./components/MainContent/MainContent";
-import { DetailInfo } from "./components/DetailInfo/DetailInfo";
-import { Box } from "@mui/material";
 
-import styles from "./App.module.scss";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { MainPage } from "./pages/MainPage/MainPage";
+import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 
 export const App = () => {
   return (
     <GlobalCssPriority>
-      <BrowserRouter>
-        <Box className={styles.app}>
-          <SearchComponent />
-          <Box className={styles["content-wrapper"]}>
-            <MainContent />
-            <DetailInfo />
-          </Box>
-        </Box>
-      </BrowserRouter>
+      <Router>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/error-page" element={<ErrorPage />} />
+        </Routes>
+      </Router>
     </GlobalCssPriority>
   );
 };
-
-{
-  /* <Typography className={styles.welcome} component="h1" variant="h3">
-  Ищем репозитории
-  <span className={styles.dot}>.</span>
-  <span className={styles.dot}>.</span>
-  <span className={styles.dot}>.</span>
-</Typography>; */
-}

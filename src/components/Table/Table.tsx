@@ -12,11 +12,12 @@ import {
 } from "@mui/material";
 
 import styles from "./Table.module.scss";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLazyGetRepositoriesQuery } from "../../api/apiSlice";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setRepository } from "./tableSlice";
+import { setError } from "../../pages/ErrorPage/errorPageSlice";
 
 interface LanguageNode {
   node: {
@@ -62,12 +63,31 @@ export const TableComponent = () => {
   const [afterCursor, setAfterCursor] = useState(null);
 
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
   const searchQuery = searchParams.get("query");
 
   const [trigger, { data, isLoading, isSuccess, isFetching }] =
     useLazyGetRepositoriesQuery();
+
+  useEffect(() => {
+    if (searchQuery) {
+      trigger({
+        query: searchQuery,
+        numberElements: rowsPerPage,
+        before: beforeCursor,
+        after: afterCursor,
+      });
+    }
+  }, [trigger, searchQuery, rowsPerPage, beforeCursor, afterCursor]);
+
+  useEffect(() => {
+    if (data?.errors) {
+      dispatch(setError(data.errors[0].message));
+      navigate("/error-page");
+    }
+  }, [data, dispatch, navigate]);
 
   useEffect(() => {
     if (isLoading || isFetching) {
@@ -85,21 +105,9 @@ export const TableComponent = () => {
     }
   }, [isLoading, isSuccess, isFetching, data]);
 
-  useEffect(() => {
-    if (searchQuery) {
-      console.log("before: ", beforeCursor, "after: ", afterCursor);
-      trigger({
-        query: searchQuery,
-        numberElements: rowsPerPage,
-        before: beforeCursor,
-        after: afterCursor,
-      });
-    }
-  }, [trigger, searchQuery, rowsPerPage, beforeCursor, afterCursor]);
-
   let formattedData = null;
-  console.log(data);
-  if (data) {
+
+  if (data && !data.errors) {
     formattedData = data.data.search.edges.map(({ node }: Edge) => {
       const {
         name,
@@ -185,7 +193,7 @@ export const TableComponent = () => {
           </Typography>
         </Box>
       )}
-      {isSuccess && !!sortedRows.length && (
+      {isSuccess && !!sortedRows?.length && (
         <Box className={styles["table-inner"]}>
           <TableContainer className={styles.table}>
             <Table aria-label="таблица с результатами">
