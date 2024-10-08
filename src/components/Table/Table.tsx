@@ -61,6 +61,7 @@ export const TableComponent = () => {
   const [message, setMessage] = useState("Добро пожаловать");
   const [beforeCursor, setBeforeCursor] = useState(null);
   const [afterCursor, setAfterCursor] = useState(null);
+  const [repositories, setRepositories] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -86,71 +87,63 @@ export const TableComponent = () => {
     if (data?.errors) {
       dispatch(setError(data.errors[0].message));
       navigate("/error-page");
+    } else if (data?.data.search.edges.length > 0) {
+      const formattedData = data.data.search.edges.map(({ node }: Edge) => {
+        const {
+          name,
+          description,
+          primaryLanguage,
+          languages,
+          forkCount,
+          stargazerCount,
+          updatedAt,
+        } = node;
+
+        const primaryLanguageName = primaryLanguage?.name ?? "Unknown";
+
+        return {
+          name,
+          description,
+          primaryLanguageName,
+          languages,
+          forkCount,
+          stargazerCount,
+          updatedAt,
+        };
+      });
+
+      const sortedRepositories = formattedData.sort((a, b) => {
+        const aValue = a[orderBy];
+        const bValue = b[orderBy];
+
+        if (aValue < bValue) {
+          return order === "asc" ? -1 : 1;
+        }
+
+        if (aValue > bValue) {
+          return order === "asc" ? 1 : -1;
+        }
+
+        return 0;
+      });
+
+      setRepositories(sortedRepositories);
     }
-  }, [data, dispatch, navigate]);
+  }, [data, dispatch, navigate, order, orderBy]);
 
   useEffect(() => {
     if (isLoading || isFetching) {
-      console.log("Загрузка...");
       setMessage("Загрузка...");
     }
 
-    if (isSuccess && data.data.search.edges.length && !isFetching) {
-      console.log("Результаты поиска");
+    if (isSuccess && data?.data?.search.edges.length && !isFetching) {
       setMessage("Результаты поиска");
     }
 
-    if (isSuccess && data.data.search.edges.length === 0 && !isFetching) {
+    if (isSuccess && data?.data?.search.edges.length === 0 && !isFetching) {
       setMessage("Ничего не найдено");
     }
   }, [isLoading, isSuccess, isFetching, data]);
-
-  let formattedData = null;
-
-  if (data && !data.errors) {
-    formattedData = data.data.search.edges.map(({ node }: Edge) => {
-      const {
-        name,
-        description,
-        primaryLanguage,
-        languages,
-        forkCount,
-        stargazerCount,
-        updatedAt,
-      } = node;
-
-      const primaryLanguageName = primaryLanguage?.name ?? "Unknown";
-
-      return {
-        name,
-        description,
-        primaryLanguageName,
-        languages,
-        forkCount,
-        stargazerCount,
-        updatedAt,
-      };
-    });
-  }
-
-  let sortedRows = null;
-
-  if (formattedData) {
-    sortedRows = formattedData.sort((a, b) => {
-      const aValue = a[orderBy];
-      const bValue = b[orderBy];
-
-      if (aValue < bValue) {
-        return order === "asc" ? -1 : 1;
-      }
-
-      if (aValue > bValue) {
-        return order === "asc" ? 1 : -1;
-      }
-
-      return 0;
-    });
-  }
 
   const rowHandler = (tableData: RepositoryData) => {
     dispatch(setRepository(tableData));
@@ -193,7 +186,7 @@ export const TableComponent = () => {
           </Typography>
         </Box>
       )}
-      {isSuccess && !!sortedRows?.length && (
+      {repositories && (
         <Box className={styles["table-inner"]}>
           <TableContainer className={styles.table}>
             <Table aria-label="таблица с результатами">
@@ -235,7 +228,7 @@ export const TableComponent = () => {
               </TableHead>
               <TableBody>
                 {isFetching
-                  ? sortedRows.map(() => (
+                  ? repositories.map(() => (
                       <TableRow>
                         <TableCell>
                           <Box className={styles["load-cell"]}></Box>
@@ -254,8 +247,7 @@ export const TableComponent = () => {
                         </TableCell>
                       </TableRow>
                     ))
-                  : sortedRows &&
-                    sortedRows.map((row, index) => {
+                  : repositories.map((row, index) => {
                       const date = new Date(row.updatedAt);
                       const year = date.getUTCFullYear();
                       const month = date.getUTCMonth() + 1;
