@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 
 import styles from "./MainContent.module.scss";
-import { TableComponent } from "../Table/Table";
+import { TableComponent } from "src/components/Table/Table";
 
 export const MainContent = () => {
   return (

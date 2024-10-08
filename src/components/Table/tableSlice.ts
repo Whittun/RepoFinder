@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../store";
-import { LanguageNode } from "../../api/apiSlice";
+import { LanguageNode } from "src/api/apiSlice";
+import { RootState } from "src/store";
 
 export interface formattedRepository {
   name: string;

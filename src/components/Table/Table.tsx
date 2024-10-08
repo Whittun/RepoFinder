@@ -15,8 +15,8 @@ import styles from "./Table.module.scss";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { formattedRepository, setRepository } from "./tableSlice";
-import { useAppDispatch } from "../../store";
-import { useRepositories } from "../../hooks/useRepositories";
+import { useAppDispatch } from "src/store";
+import { useRepositories } from "src/hooks/useRepositories";
 
 export const TableComponent = () => {
   const [page, setPage] = useState<number>(0);

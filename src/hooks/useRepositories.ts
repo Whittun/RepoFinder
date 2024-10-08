@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { formattedRepository } from "../components/Table/tableSlice";
-import { useLazyGetRepositoriesQuery } from "../api/apiSlice";
-import { useAppDispatch } from "../store";
-import { setError } from "../pages/ErrorPage/errorPageSlice";
 import { useNavigate } from "react-router-dom";
+import { useLazyGetRepositoriesQuery } from "src/api/apiSlice";
+import { formattedRepository } from "src/components/Table/tableSlice";
+import { setError } from "src/pages/ErrorPage/errorPageSlice";
+import { useAppDispatch } from "src/store";
 
 export const useRepositories = (
   searchQuery: string | null,

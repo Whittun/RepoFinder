@@ -10,9 +10,9 @@ import StarIcon from "@mui/icons-material/Star";
 import CloseIcon from "@mui/icons-material/Close";
 
 import styles from "./DetailInfo.module.scss";
-import { selectSetRepository } from "../Table/tableSlice";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../../store";
+import { useAppSelector } from "src/store";
+import { selectSetRepository } from "src/components/Table/tableSlice";
 
 export const DetailInfo = () => {
   const selectedRepository = useAppSelector(selectSetRepository);
