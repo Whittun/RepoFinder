@@ -10,13 +10,13 @@ import StarIcon from "@mui/icons-material/Star";
 import CloseIcon from "@mui/icons-material/Close";
 
 import styles from "./DetailInfo.module.scss";
-import { useSelector } from "react-redux";
 import { selectSetRepository } from "../Table/tableSlice";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "../../store";
 
 export const DetailInfo = () => {
-  const selectedRepository = useSelector(selectSetRepository);
-  const [isOpen, setIsOpen] = useState(false);
+  const selectedRepository = useAppSelector(selectSetRepository);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (selectedRepository) {

@@ -1,5 +1,59 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+export interface Repositories {
+  data: {
+    search: {
+      edges: Repository[];
+      pageInfo: {
+        endCursor: string;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+        startCursor: string;
+      };
+    };
+  };
+}
+
+export interface Repository {
+  cursor: string;
+  node: {
+    description: string;
+    forkCount: number;
+    languages: { edges: LanguageNode[] };
+    name: string;
+    primaryLanguage: { name: string };
+    stargazerCount: number;
+    updatedAt: string;
+  };
+}
+
+export interface LanguageNode {
+  node: {
+    name: string;
+  };
+}
+
+interface SearchArgs {
+  query: string;
+  numberElements: number;
+  before: string | null;
+  after: string | null;
+}
+
+interface Errors {
+  errors: Error[];
+}
+
+interface Error {
+  locations: ErrorLocation[];
+  message: string;
+}
+
+interface ErrorLocation {
+  column: number;
+  line: number;
+}
+
 export const githubGraphQLApi = createApi({
   reducerPath: "githubGraphQLApi",
   baseQuery: fetchBaseQuery({
@@ -12,7 +66,7 @@ export const githubGraphQLApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getRepositories: builder.query({
+    getRepositories: builder.query<Repositories | Errors, SearchArgs>({
       query: ({ query, numberElements, before, after }) => {
         const gqlQuery = `
             query() {
@@ -47,7 +101,7 @@ export const githubGraphQLApi = createApi({
                 }
               }
             }`;
-        console.log(gqlQuery);
+
         return {
           url: "",
           method: "POST",
@@ -61,5 +115,3 @@ export const githubGraphQLApi = createApi({
 });
 
 export const { useLazyGetRepositoriesQuery } = githubGraphQLApi;
-
-// before: ${before ? `"${before}"` : "null"}, after: ${after ? `"${after}"` : "null"}

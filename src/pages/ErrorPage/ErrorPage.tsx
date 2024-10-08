@@ -3,9 +3,10 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styles from "./ErrorPage.module.scss";
+import { RootState } from "../../store";
 
 export const ErrorPage = () => {
-  const error = useSelector((state) => state.error);
+  const error = useSelector((state: RootState) => state.error);
   const navigate = useNavigate();
 
   useEffect(() => {

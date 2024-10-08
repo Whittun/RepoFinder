@@ -15,55 +15,25 @@ import styles from "./Table.module.scss";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLazyGetRepositoriesQuery } from "../../api/apiSlice";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { setRepository } from "./tableSlice";
+import { formattedRepository, setRepository } from "./tableSlice";
 import { setError } from "../../pages/ErrorPage/errorPageSlice";
-
-interface LanguageNode {
-  node: {
-    name: string;
-  };
-}
-
-export interface RepositoryData {
-  name: string;
-  description: string;
-  primaryLanguageName: string;
-  languages: { edges: LanguageNode[] };
-  forkCount: number;
-  stargazerCount: number;
-  updatedAt: string;
-}
-
-interface NodeData {
-  name: string;
-  description: string;
-  primaryLanguage: {
-    name: string;
-  } | null;
-  languages: {
-    edges: LanguageNode[];
-  };
-  forkCount: number;
-  stargazerCount: number;
-  updatedAt: string;
-}
-
-interface Edge {
-  node: NodeData;
-}
+import { useAppDispatch } from "../../store";
 
 export const TableComponent = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<keyof RepositoryData>("forkCount");
-  const [message, setMessage] = useState("Добро пожаловать");
-  const [beforeCursor, setBeforeCursor] = useState(null);
-  const [afterCursor, setAfterCursor] = useState(null);
-  const [repositories, setRepositories] = useState(null);
+  const [orderBy, setOrderBy] =
+    useState<keyof formattedRepository>("forkCount");
+  const [message, setMessage] = useState<string>("Добро пожаловать");
+  const [beforeCursor, setBeforeCursor] = useState<null | string>(null);
+  const [afterCursor, setAfterCursor] = useState<null | string>(null);
+  const [repositories, setRepositories] = useState<
+    null | formattedRepository[]
+  >(null);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -81,53 +51,58 @@ export const TableComponent = () => {
         after: afterCursor,
       });
     }
+
+    setIsDataLoading(true);
   }, [trigger, searchQuery, rowsPerPage, beforeCursor, afterCursor]);
 
   useEffect(() => {
-    if (data?.errors) {
-      dispatch(setError(data.errors[0].message));
-      navigate("/error-page");
-    } else if (data?.data.search.edges.length > 0) {
-      const formattedData = data.data.search.edges.map(({ node }: Edge) => {
-        const {
-          name,
-          description,
-          primaryLanguage,
-          languages,
-          forkCount,
-          stargazerCount,
-          updatedAt,
-        } = node;
+    if (data) {
+      if ("errors" in data) {
+        dispatch(setError(data.errors[0].message));
+        navigate("/error-page");
+      } else if (data?.data.search.edges.length > 0) {
+        const formattedData = data.data.search.edges.map(({ node }) => {
+          const {
+            name,
+            description,
+            primaryLanguage,
+            languages,
+            forkCount,
+            stargazerCount,
+            updatedAt,
+          } = node;
 
-        const primaryLanguageName = primaryLanguage?.name ?? "Unknown";
+          const primaryLanguageName = primaryLanguage?.name ?? "Unknown";
 
-        return {
-          name,
-          description,
-          primaryLanguageName,
-          languages,
-          forkCount,
-          stargazerCount,
-          updatedAt,
-        };
-      });
+          return {
+            name,
+            description,
+            primaryLanguageName,
+            languages,
+            forkCount,
+            stargazerCount,
+            updatedAt,
+          };
+        });
 
-      const sortedRepositories = formattedData.sort((a, b) => {
-        const aValue = a[orderBy];
-        const bValue = b[orderBy];
+        const sortedRepositories = formattedData.sort((a, b) => {
+          const aValue = a[orderBy];
+          const bValue = b[orderBy];
 
-        if (aValue < bValue) {
-          return order === "asc" ? -1 : 1;
-        }
+          if (aValue < bValue) {
+            return order === "asc" ? -1 : 1;
+          }
 
-        if (aValue > bValue) {
-          return order === "asc" ? 1 : -1;
-        }
+          if (aValue > bValue) {
+            return order === "asc" ? 1 : -1;
+          }
 
-        return 0;
-      });
+          return 0;
+        });
 
-      setRepositories(sortedRepositories);
+        setRepositories(sortedRepositories);
+        setIsDataLoading(false);
+      }
     }
   }, [data, dispatch, navigate, order, orderBy]);
 
@@ -135,21 +110,22 @@ export const TableComponent = () => {
     if (isLoading || isFetching) {
       setMessage("Загрузка...");
     }
-
-    if (isSuccess && data?.data?.search.edges.length && !isFetching) {
-      setMessage("Результаты поиска");
-    }
-
-    if (isSuccess && data?.data?.search.edges.length === 0 && !isFetching) {
-      setMessage("Ничего не найдено");
+    if (data && "data" in data) {
+      if (isSuccess && data.data.search.edges.length && !isFetching) {
+        setMessage("Результаты поиска");
+      }
+      if (isSuccess && data.data.search.edges.length === 0 && !isFetching) {
+        setMessage("Ничего не найдено");
+        setRepositories(null);
+      }
     }
   }, [isLoading, isSuccess, isFetching, data]);
 
-  const rowHandler = (tableData: RepositoryData) => {
+  const rowHandler = (tableData: formattedRepository) => {
     dispatch(setRepository(tableData));
   };
 
-  const handleRowOrder = (row: keyof RepositoryData) => {
+  const handleRowOrder = (row: keyof formattedRepository) => {
     const isAsc = row === orderBy && order === "asc";
 
     setOrder(isAsc ? "desc" : "asc");
@@ -157,15 +133,17 @@ export const TableComponent = () => {
   };
 
   const changePageHandler = (newPage: number) => {
-    if (newPage > page && data.data.search.pageInfo.hasNextPage) {
-      setAfterCursor(data.data.search.pageInfo.endCursor);
-      setBeforeCursor(null);
-    } else if (newPage < page && data.data.search.pageInfo.hasPreviousPage) {
-      setBeforeCursor(data.data.search.pageInfo.startCursor);
-      setAfterCursor(null);
-    }
+    if (data && "data" in data) {
+      if (newPage > page && data.data.search.pageInfo.hasNextPage) {
+        setAfterCursor(data.data.search.pageInfo.endCursor);
+        setBeforeCursor(null);
+      } else if (newPage < page && data.data.search.pageInfo.hasPreviousPage) {
+        setBeforeCursor(data.data.search.pageInfo.startCursor);
+        setAfterCursor(null);
+      }
 
-    setPage(newPage);
+      setPage(newPage);
+    }
   };
 
   const changeRowsPerPageHandler = (rowsPerPage: number) => {
@@ -186,7 +164,7 @@ export const TableComponent = () => {
           </Typography>
         </Box>
       )}
-      {repositories && (
+      {repositories && data && "data" in data && (
         <Box className={styles["table-inner"]}>
           <TableContainer className={styles.table}>
             <Table aria-label="таблица с результатами">
@@ -227,26 +205,28 @@ export const TableComponent = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {isFetching
-                  ? repositories.map(() => (
-                      <TableRow>
-                        <TableCell>
-                          <Box className={styles["load-cell"]}></Box>
-                        </TableCell>
-                        <TableCell>
-                          <Box className={styles["load-cell"]}></Box>
-                        </TableCell>
-                        <TableCell>
-                          <Box className={styles["load-cell"]}></Box>
-                        </TableCell>
-                        <TableCell>
-                          <Box className={styles["load-cell"]}></Box>
-                        </TableCell>
-                        <TableCell>
-                          <Box className={styles["load-cell"]}></Box>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                {isDataLoading
+                  ? [...Array(rowsPerPage)].map((_, index) => {
+                      return (
+                        <TableRow key={index}>
+                          <TableCell>
+                            <Box className={styles["load-cell"]}></Box>
+                          </TableCell>
+                          <TableCell>
+                            <Box className={styles["load-cell"]}></Box>
+                          </TableCell>
+                          <TableCell>
+                            <Box className={styles["load-cell"]}></Box>
+                          </TableCell>
+                          <TableCell>
+                            <Box className={styles["load-cell"]}></Box>
+                          </TableCell>
+                          <TableCell>
+                            <Box className={styles["load-cell"]}></Box>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   : repositories.map((row, index) => {
                       const date = new Date(row.updatedAt);
                       const year = date.getUTCFullYear();
@@ -278,19 +258,18 @@ export const TableComponent = () => {
             rowsPerPage={rowsPerPage}
             onPageChange={(_, newPage) => changePageHandler(newPage)}
             onRowsPerPageChange={(e) =>
-              changeRowsPerPageHandler(e.target.value)
+              changeRowsPerPageHandler(Number(e.target.value))
             }
             count={-1}
             slotProps={{
               actions: {
                 nextButton: {
                   disabled:
-                    !data.data.search.pageInfo.hasNextPage || isFetching,
+                    !data.data?.search.pageInfo.hasNextPage || isFetching,
                 },
                 previousButton: {
                   disabled:
-                    isFetching ||
-                    !data?.data?.search?.pageInfo?.hasPreviousPage,
+                    isFetching || !data.data?.search?.pageInfo?.hasPreviousPage,
                 },
               },
             }}
