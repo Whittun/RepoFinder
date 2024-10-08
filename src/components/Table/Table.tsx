@@ -12,12 +12,11 @@ import {
 } from "@mui/material";
 
 import styles from "./Table.module.scss";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useLazyGetRepositoriesQuery } from "../../api/apiSlice";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { formattedRepository, setRepository } from "./tableSlice";
-import { setError } from "../../pages/ErrorPage/errorPageSlice";
 import { useAppDispatch } from "../../store";
+import { useRepositories } from "../../hooks/useRepositories";
 
 export const TableComponent = () => {
   const [page, setPage] = useState<number>(0);
@@ -26,85 +25,22 @@ export const TableComponent = () => {
   const [orderBy, setOrderBy] =
     useState<keyof formattedRepository>("forkCount");
   const [message, setMessage] = useState<string>("Добро пожаловать");
-  const [beforeCursor, setBeforeCursor] = useState<null | string>(null);
-  const [afterCursor, setAfterCursor] = useState<null | string>(null);
-  const [repositories, setRepositories] = useState<
-    null | formattedRepository[]
-  >(null);
-  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const searchQuery = searchParams.get("query");
 
-  const [trigger, { data, isLoading, isSuccess, isFetching }] =
-    useLazyGetRepositoriesQuery();
-
-  useEffect(() => {
-    if (searchQuery) {
-      trigger({
-        query: searchQuery,
-        numberElements: rowsPerPage,
-        before: beforeCursor,
-        after: afterCursor,
-      });
-    }
-
-    setIsDataLoading(true);
-  }, [trigger, searchQuery, rowsPerPage, beforeCursor, afterCursor]);
-
-  useEffect(() => {
-    if (data) {
-      if ("errors" in data) {
-        dispatch(setError(data.errors[0].message));
-        navigate("/error-page");
-      } else if (data?.data.search.edges.length > 0) {
-        const formattedData = data.data.search.edges.map(({ node }) => {
-          const {
-            name,
-            description,
-            primaryLanguage,
-            languages,
-            forkCount,
-            stargazerCount,
-            updatedAt,
-          } = node;
-
-          const primaryLanguageName = primaryLanguage?.name ?? "Unknown";
-
-          return {
-            name,
-            description,
-            primaryLanguageName,
-            languages,
-            forkCount,
-            stargazerCount,
-            updatedAt,
-          };
-        });
-
-        const sortedRepositories = formattedData.sort((a, b) => {
-          const aValue = a[orderBy];
-          const bValue = b[orderBy];
-
-          if (aValue < bValue) {
-            return order === "asc" ? -1 : 1;
-          }
-
-          if (aValue > bValue) {
-            return order === "asc" ? 1 : -1;
-          }
-
-          return 0;
-        });
-
-        setRepositories(sortedRepositories);
-        setIsDataLoading(false);
-      }
-    }
-  }, [data, dispatch, navigate, order, orderBy]);
+  const {
+    data,
+    repositories,
+    isLoading,
+    isFetching,
+    isSuccess,
+    isDataLoading,
+    setAfterCursor,
+    setBeforeCursor,
+  } = useRepositories(searchQuery, rowsPerPage, orderBy, order);
 
   useEffect(() => {
     if (isLoading || isFetching) {
@@ -116,7 +52,6 @@ export const TableComponent = () => {
       }
       if (isSuccess && data.data.search.edges.length === 0 && !isFetching) {
         setMessage("Ничего не найдено");
-        setRepositories(null);
       }
     }
   }, [isLoading, isSuccess, isFetching, data]);
