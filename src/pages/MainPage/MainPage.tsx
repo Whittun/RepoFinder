@@ -3,7 +3,7 @@ import { SearchComponent } from "../../components/Search/Search";
 import { MainContent } from "../../components/MainContent/MainContent";
 import { DetailInfo } from "../../components/DetailInfo/DetailInfo";
 
-import styles from "../../App.module.scss";
+import styles from "./MainPage.module.scss";
 
 export const MainPage = () => {
   return (

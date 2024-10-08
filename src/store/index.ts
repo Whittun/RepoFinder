@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
 import tableReducer from "../components/Table/tableSlice";
-import searchReducer from "./searchSlice";
 import errorReducer from "../pages/ErrorPage/errorPageSlice";
 import { githubGraphQLApi } from "../api/apiSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 export const store = configureStore({
   reducer: {
     table: tableReducer,
-    search: searchReducer,
     error: errorReducer,
     [githubGraphQLApi.reducerPath]: githubGraphQLApi.reducer,
   },
