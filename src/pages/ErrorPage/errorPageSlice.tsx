@@ -4,7 +4,9 @@ const errorPageSlice = createSlice({
   name: "error",
   initialState: null,
   reducers: {
-    setError: (state, action) => action.payload,
+    setError: (_, action) => {
+      return action.payload;
+    },
     clearError: () => null,
   },
 });
