@@ -9,5 +9,5 @@ export default defineConfig({
       src: "/src",
     },
   },
-  base: "/RepoFinder/",
+  base: "/repofinder/",
 });
