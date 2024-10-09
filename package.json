@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://whittun.github.io/RepoFinder",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
