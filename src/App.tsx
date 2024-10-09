@@ -7,7 +7,7 @@ import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 export const App = () => {
   return (
     <GlobalCssPriority>
-      <Router>
+      <Router basename="/RepoFinder">
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/error-page" element={<ErrorPage />} />
