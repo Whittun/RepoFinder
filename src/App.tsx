@@ -7,11 +7,7 @@ import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 export const App = () => {
   return (
     <GlobalCssPriority>
-      <Router
-        basename={
-          import.meta.env.VITE_GITHUB_PAGES === "true" ? "/RepoFinder/" : "/"
-        }
-      >
+      <Router basename="/">
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/error-page" element={<ErrorPage />} />

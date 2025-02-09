@@ -9,7 +9,7 @@ export default defineConfig({
       src: "/src",
     },
   },
-  base: process.env.VITE_GITHUB_PAGES === "true" ? "/RepoFinder/" : "/",
+  base: "/",
   server: {
     proxy: {
       "/api": {
