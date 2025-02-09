@@ -57,7 +57,7 @@ interface ErrorLocation {
 export const githubGraphQLApi = createApi({
   reducerPath: "githubGraphQLApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://api.github.com/graphql",
+    baseUrl: "/api",
     prepareHeaders: (headers) => {
       headers.set("Authorization", `bearer ${import.meta.env.VITE_API_KEY}`);
       headers.set("Content-Type", "application/json");

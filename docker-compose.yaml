@@ -1,0 +1,22 @@
+version: "v2.31.0-desktop.2"
+services:
+  project-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: repofinder-prod
+    ports:
+      - "8000:80"
+    volumes:
+      - ./public/image:/usr/share/nginx/html/image/
+      - /app/node_modules
+  project-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: repofinder-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/app
+      - /app/node_modules
