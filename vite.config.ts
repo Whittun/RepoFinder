@@ -11,6 +11,9 @@ export default defineConfig({
   },
   base: "/",
   server: {
+    watch: {
+      usePolling: true,
+    },
     proxy: {
       "/api": {
         target: "https://api.github.com",
